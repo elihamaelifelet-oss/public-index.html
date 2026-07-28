@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "public/index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "api/lead.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src
