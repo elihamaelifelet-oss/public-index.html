@@ -1,0 +1,12 @@
+{
+  "name": "luno-login-clone",
+  "version": "1.0.0",
+  "description": "Secure Luno login clone with Vercel backend",
+  "main": "api/lead.js",
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
